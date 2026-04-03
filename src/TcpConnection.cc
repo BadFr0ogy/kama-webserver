@@ -69,7 +69,10 @@ void TcpConnection::send(const std::string &buf)
         else
         {
             loop_->runInLoop(
-                std::bind(&TcpConnection::sendInLoop, this, buf.c_str(), buf.size()));
+                [this, msg = std::move(buf)]()  // move 进 lambda，零拷贝
+                {
+                    sendInLoop(msg.c_str(), msg.size());
+                });
         }
     }
 }
